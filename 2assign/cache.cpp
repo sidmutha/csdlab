@@ -81,3 +81,34 @@ void Cache::put(int address){
     wrapper->cacheArray[id+1].write(address);
   }
 }
+
+int Cache::getVictim(int set){
+  int i,j,way,min;
+  switch(replacementPolicy){
+  case 0:
+    //Finding least recently used address
+    for(i = 0; i < numWays; i++)
+      if(cache[set][i].lru == 0){
+	way = i;
+	break;
+      }
+    break;
+  case 1:
+    //Finding minimum frequency address
+    min = cache[set][0];
+    way =0;
+    for(i=1;i<numWays;i++)
+      if(min < cache[set][i].freq){
+	min = cache[set][i].freq;
+	way = i;
+      }
+		
+    break;
+  case 2:
+    way = rand() % numWays;
+    break;
+
+    return way;
+  }
+}		
+
