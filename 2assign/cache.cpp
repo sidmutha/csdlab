@@ -1,6 +1,6 @@
 #include"cache.h"
 
-Cache::Cache(int size, int associativity, int blockSize, int replacementPolicy){
+Cache::Cache(int id, int size, int associativity, int blockSize, int replacementPolicy){
   numSets = size * 1024 / (associativity * blockSize);
   numWays = associativity;
   cache = new CacheEntry*[numSets];
@@ -21,26 +21,63 @@ Cache::Cache(int size, int associativity, int blockSize, int replacementPolicy){
   writeHits = 0;
   writeMisses = 0;
   this->replacementPolicy = replacementPolicy;
-  
+  this->id = id;
 
 }
 
-Cache::read(int address){
+void Cache::read(int address){
   int set = getSet(address);
   int tag = getTag(address);
   int way;
-  if((way = findTagInSet(tag)) != -1){
+  if((way = findTagInSet(tag)) != -1){ // address present in cache
     readHits++;
-    return;
-  }else{
+    cache[set][way].lru = 1;
+    cache[set][way].freq++;
+  }else{ // address not in cache/set
     readMisses++;
-    get(address);
+    get(address); // get data from higher level cache
+    way = getVictim(set); // get victim from the set
+    if(cache[set][way].dirty){ // if dirty, 
+      put(generatePseudoAddress(set, tag)); // evict to higher level cache
+    }
+    cache[set][way].tag = tag; // install data/tag in cache line
+    cache[set][way].lru = 1;
+    cache[set][way].dirty = false;
+    cache[set][way].freq = 1;
   }
 }
 
-Cache::write(address){
+void Cache::write(int address){
   int set = getSet(address);
   int tag = getTag(address);
   int way;
-  
+  if((way = findTagInSet(tag)) != -1){ // address present in cache
+    writeHits++;
+    cache[set][way].dirty = true;
+    cache[set][way].lru = 1;
+    cache[set][way].freq++;
+  }else{ // address not in cache/set
+    writeMisses++;
+    get(address); // get data from higher level cache
+    way = getVictim(set); // get victim from the set
+    if(cache[set][way].dirty){ // if dirty, 
+      put(generatePseudoAddress(set, tag)); // evict to higher level cache
+    }
+    cache[set][way].tag = tag; // install data/tag in cache line
+    cache[set][way].lru = 1;
+    cache[set][way].dirty = true; // because we're writing to it
+    cache[set][way].freq = 1;
+  }
+}
+
+void Cache::get(int address){
+  if(id+1 != wrapper->ramID){
+    wrapper->cacheArray[id+1].read(address);
+  }
+}
+
+void Cache::put(int address){
+  if(id+1 != wrapper->ramID){
+    wrapper->cacheArray[id+1].write(address);
+  }
 }
