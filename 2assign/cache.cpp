@@ -88,7 +88,7 @@ uint64_t Cache::getTag(uint64_t address){
 }
 
 uint64_t Cache::generatePseudoAddress(int set, uint64_t tag){
-  return 0;
+  //return 0;
 }
 
 int Cache::findTagInSet(uint64_t tag, int set){
