@@ -1,10 +1,15 @@
 #include"cache.h"
+#include"wrapper.h"
+#include<cstdlib>
+#include<time.h>
+#include<math.h>
 
-Cache::Cache(int id, int size, int associativity, int blockSize, int replacementPolicy){
+Cache::Cache(int id, Wrapper *w, int size, int associativity, int blockSize, int replacementPolicy){
   numSets = size * 1024 / (associativity * blockSize);
   numWays = associativity;
   cache = new CacheEntry*[numSets];
-  int i;
+  srand(time(NULL));
+  int i, j;
   for(i = 0; i < numSets; i++){
     cache[i] = new CacheEntry[numWays];
     for(j = 0; j < numWays; j++){
@@ -22,14 +27,18 @@ Cache::Cache(int id, int size, int associativity, int blockSize, int replacement
   writeMisses = 0;
   this->replacementPolicy = replacementPolicy;
   this->id = id;
-
+  this->wrapper = w;
+  this->offsetBits = log2(blockSize);
+  this->setBits = log2(numSets);
+  this->tagBits = 64 - offsetBits - setBits;
 }
 
-void Cache::read(int address){
+
+void Cache::read(uint64_t address){
   int set = getSet(address);
-  int tag = getTag(address);
+  uint64_t tag = getTag(address);
   int way;
-  if((way = findTagInSet(tag)) != -1){ // address present in cache
+  if((way = findTagInSet(tag, set)) != -1){ // address present in cache
     readHits++;
     cache[set][way].lru = 1;
     cache[set][way].freq++;
@@ -47,11 +56,11 @@ void Cache::read(int address){
   }
 }
 
-void Cache::write(int address){
+void Cache::write(uint64_t address){
   int set = getSet(address);
-  int tag = getTag(address);
+  uint64_t tag = getTag(address);
   int way;
-  if((way = findTagInSet(tag)) != -1){ // address present in cache
+  if((way = findTagInSet(tag, set)) != -1){ // address present in cache
     writeHits++;
     cache[set][way].dirty = true;
     cache[set][way].lru = 1;
@@ -70,23 +79,44 @@ void Cache::write(int address){
   }
 }
 
-void Cache::get(int address){
+int Cache::getSet(uint64_t address){
+  return ((address << tagBits) >> (tagBits + offsetBits));
+}
+
+uint64_t Cache::getTag(uint64_t address){
+  return address >> (64 - tagBits);
+}
+
+uint64_t Cache::generatePseudoAddress(int set, uint64_t tag){
+  return 0;
+}
+
+int Cache::findTagInSet(uint64_t tag, int set){
+  int i;
+  for(i = 0; i < numWays; i++){
+    if(cache[set][i].tag == tag){
+      return i;
+    }
+  }
+}
+
+void Cache::get(uint64_t address){
   if(id+1 != wrapper->ramID){
     wrapper->cacheArray[id+1].read(address);
   }
 }
 
-void Cache::put(int address){
+void Cache::put(uint64_t address){
   if(id+1 != wrapper->ramID){
     wrapper->cacheArray[id+1].write(address);
   }
 }
 
 int Cache::getVictim(int set){
-  int i,j,way,min;
+  int i, j, way, min;
   switch(replacementPolicy){
   case 0:
-    //Finding least recently used address
+    // Finding least recently used address
     for(i = 0; i < numWays; i++)
       if(cache[set][i].lru == 0){
 	way = i;
@@ -94,21 +124,22 @@ int Cache::getVictim(int set){
       }
     break;
   case 1:
-    //Finding minimum frequency address
-    min = cache[set][0];
-    way =0;
-    for(i=1;i<numWays;i++)
+    // Finding minimum frequency address
+    min = cache[set][0].freq;
+    way = 0;
+    for(i = 1; i < numWays; i++)
       if(min < cache[set][i].freq){
 	min = cache[set][i].freq;
 	way = i;
       }
-		
     break;
-  case 2:
+  case 2://Random eviction policy
     way = rand() % numWays;
-    break;
-
-    return way;
+    break;    
   }
+  return way;  
 }		
 
+Cache::Cache(){
+  
+}

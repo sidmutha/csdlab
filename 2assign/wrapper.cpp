@@ -5,11 +5,12 @@ Wrapper::Wrapper(int numCaches){
   ramID = numCaches;
 }
 
-void Wrapper::read(int address){
+void Wrapper::read(uint64_t address){
   cacheArray[0].read(address);
 }
 
-void Wrapper::write(int address){
+void Wrapper::write(uint64_t address){
   cacheArray[0].write(address);
 }
+
 
