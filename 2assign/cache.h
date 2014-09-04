@@ -12,7 +12,7 @@ struct CacheEntry{
   int freq;
   bool lru;
   bool dirty;
-   int state;
+  int state;
 };
 
 class Wrapper;
@@ -27,10 +27,10 @@ class Cache{
   int id;
   int offsetBits;
   
-int setBits;
-int tagBits;  
+  int setBits;
+  int tagBits;  
 
-Wrapper* wrapper;
+  Wrapper* wrapper;
   
   Cache(int id, Wrapper* w, int size, int associativity, int blockSize, int replacementPolicy);
   
@@ -42,8 +42,8 @@ Wrapper* wrapper;
   
   int getSet(uint64_t address);
   uint64_t getTag(uint64_t address);
-uint64_t generatePseudoAddress(int set, uint64_t tag);
-int findTagInSet(uint64_t tag, int set); 
+  uint64_t generatePseudoAddress(int set, uint64_t tag);
+  int findTagInSet(uint64_t tag, int set); 
   
   // do we really need these?
   void get(uint64_t address);

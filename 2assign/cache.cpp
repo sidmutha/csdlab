@@ -48,7 +48,7 @@ void Cache::read(uint64_t address){
     get(address); // get data from higher level cache
     way = getVictim(set); // get victim from the set
    
-	 if(cache[set][way].dirty){ // if dirty, 
+    if(cache[set][way].dirty){ // if dirty, 
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
     }
     delete(address);
@@ -120,16 +120,16 @@ void Cache::put(uint64_t address){
 }
 
 void Cache::delete(uint64_t address){
-   int set,way;
-   uint64_t tag;
-   set = getSet(address);
-   tag = getTag(address);	
-   way = findTagInSet(tag, set);
-   cache[set][way].state =0;
+  int set,way;
+  uint64_t tag;
+  set = getSet(address);
+  tag = getTag(address);	
+  way = findTagInSet(tag, set);
+  cache[set][way].state =0;
   if(id == 0)
-		return;
-
-	wrapper->cacheArray[id-1].delete(address); 		   		 
+    return;
+  
+  wrapper->cacheArray[id-1].delete(address); 		   		 
 
 }
 int Cache::getVictim(int set){
