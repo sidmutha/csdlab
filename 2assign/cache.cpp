@@ -19,6 +19,7 @@ Cache::Cache(int id, Wrapper *w, int size, int associativity, int blockSize, int
       c->freq = 0;
       c->dirty = false;
       c->lru = 0;
+      c->state = 0;
     }
   }
   readHits = 0;
@@ -46,13 +47,16 @@ void Cache::read(uint64_t address){
     readMisses++;
     get(address); // get data from higher level cache
     way = getVictim(set); // get victim from the set
-    if(cache[set][way].dirty){ // if dirty, 
+   
+	 if(cache[set][way].dirty){ // if dirty, 
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
     }
+    delete(address);
     cache[set][way].tag = tag; // install data/tag in cache line
     cache[set][way].lru = 1;
     cache[set][way].dirty = false;
     cache[set][way].freq = 1;
+    cache[set][way].state =1;	
   }
 }
 
@@ -65,6 +69,7 @@ void Cache::write(uint64_t address){
     cache[set][way].dirty = true;
     cache[set][way].lru = 1;
     cache[set][way].freq++;
+
   }else{ // address not in cache/set
     writeMisses++;
     get(address); // get data from higher level cache
@@ -72,10 +77,12 @@ void Cache::write(uint64_t address){
     if(cache[set][way].dirty){ // if dirty, 
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
     }
+    delete(address);
     cache[set][way].tag = tag; // install data/tag in cache line
     cache[set][way].lru = 1;
     cache[set][way].dirty = true; // because we're writing to it
     cache[set][way].freq = 1;
+    cache[set][way].state = 1 ;
   }
 }
 
@@ -94,7 +101,7 @@ uint64_t Cache::generatePseudoAddress(int set, uint64_t tag){
 int Cache::findTagInSet(uint64_t tag, int set){
   int i;
   for(i = 0; i < numWays; i++){
-    if(cache[set][i].tag == tag){
+    if(cache[set][i].tag == tag && cache[set][way].state == 1){
       return i;
     }
   }
@@ -112,6 +119,19 @@ void Cache::put(uint64_t address){
   }
 }
 
+void Cache::delete(uint64_t address){
+   int set,way;
+   uint64_t tag;
+   set = getSet(address);
+   tag = getTag(address);	
+   way = findTagInSet(tag, set);
+   cache[set][way].state =0;
+  if(id == 0)
+		return;
+
+	wrapper->cacheArray[id-1].delete(address); 		   		 
+
+}
 int Cache::getVictim(int set){
   int i, j, way, min;
   switch(replacementPolicy){

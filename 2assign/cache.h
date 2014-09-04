@@ -12,6 +12,7 @@ struct CacheEntry{
   int freq;
   bool lru;
   bool dirty;
+   int state;
 };
 
 class Wrapper;
@@ -25,6 +26,7 @@ class Cache{
   int replacementPolicy;
   int id;
   int offsetBits;
+  
 int setBits;
 int tagBits;  
 
