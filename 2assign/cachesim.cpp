@@ -74,7 +74,34 @@ int main(int argc, char** argv){
     }
     
     w->cacheArray[i] = Cache(i, w, size, asso, blockSize, replacementPolicy);
-    cout << i << ", "  << size << ", " << asso << ", " << blockSize << ", " << replacementPolicy << endl;
+    //cout << i << ", "  << size << ", " << asso << ", " << blockSize << ", " << replacementPolicy << endl;
   }
+  f.close();
+  // readin pintrace file:
+  f.open("pinatrace_mini.out");
+  string rw;
+  uint64_t addr = 0x7fa4f3a28a60;
+  string t;
+  do{
+    line.clear();
+    getline(f, line);
+    if(line.compare("#eof") == 0)
+      break;
+    //cout << line << endl;
+    ss.str(string());
+    ss.clear();
+    ss << line;
+    
+    ss >> temp >> rw >> t;// >> addr;
+    /*
+    if(rw.compare("R")){
+      w->read(addr);
+    }else{
+      w->write(addr);
+    }
+    */
+    cout << t << " | " << rw << endl;
+    
+  }while(true);
   return 0;
 }
