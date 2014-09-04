@@ -41,21 +41,24 @@
 #include<sstream>
 #include<fstream>
 #include<cstdint>
-
+using namespace std;
 
 FILE * trace;
 Wrapper* w;
+
 // Print a memory read record
 VOID RecordMemRead(VOID * ip, VOID * addr)
 {
-  //fprintf(trace,"%p: R %p\n", ip, addr);
+  fprintf(trace,"%p: R %p\n", ip, addr);
+  //cout << "read\n";
   w->read((uint64_t) addr);
 }
 
 // Print a memory write record
 VOID RecordMemWrite(VOID * ip, VOID * addr)
 {
-  //fprintf(trace,"%p: W %p\n", ip, addr);
+  fprintf(trace,"%p: W %p\n", ip, addr);
+  //cout << "write\n";
   w->write((uint64_t) addr);
 
 }
@@ -121,15 +124,15 @@ int main(int argc, char *argv[])
   if (PIN_Init(argc, argv)) return Usage();
     
   trace = fopen("pinatrace.out", "w");
+  
   // read config.txt
   string line;
-  ifstream f("config.txt");
+  ifstream f("config.txt");;//argv[1]);
   getline(f, line);
   stringstream ss(line);
   string temp;
   int numCaches;
   ss >> temp >> temp >> numCaches;
-
   w = new Wrapper(numCaches);
 
   int i;
@@ -180,7 +183,7 @@ int main(int argc, char *argv[])
     }
     
     w->cacheArray[i] = Cache(i, w, size, asso, blockSize, replacementPolicy);
-    
+    //cout << i << " " << size << " "<< asso << " "<< blockSize << " "<< endl;
   }
   f.close();
 

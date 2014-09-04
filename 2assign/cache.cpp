@@ -51,7 +51,7 @@ void Cache::read(uint64_t address){
     if(cache[set][way].dirty){ // if dirty, 
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
     }
-    delete(address);
+    deleteAddressEntry(address);
     cache[set][way].tag = tag; // install data/tag in cache line
     cache[set][way].lru = 1;
     cache[set][way].dirty = false;
@@ -77,7 +77,7 @@ void Cache::write(uint64_t address){
     if(cache[set][way].dirty){ // if dirty, 
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
     }
-    delete(address);
+    deleteAddressEntry(address);
     cache[set][way].tag = tag; // install data/tag in cache line
     cache[set][way].lru = 1;
     cache[set][way].dirty = true; // because we're writing to it
@@ -101,7 +101,7 @@ uint64_t Cache::generatePseudoAddress(int set, uint64_t tag){
 int Cache::findTagInSet(uint64_t tag, int set){
   int i;
   for(i = 0; i < numWays; i++){
-    if(cache[set][i].tag == tag && cache[set][way].state == 1){
+    if(cache[set][i].tag == tag && cache[set][i].state == 1){
       return i;
     }
   }
@@ -119,7 +119,7 @@ void Cache::put(uint64_t address){
   }
 }
 
-void Cache::delete(uint64_t address){
+void Cache::deleteAddressEntry(uint64_t address){
   int set,way;
   uint64_t tag;
   set = getSet(address);
@@ -129,7 +129,7 @@ void Cache::delete(uint64_t address){
   if(id == 0)
     return;
   
-  wrapper->cacheArray[id-1].delete(address); 		   		 
+  wrapper->cacheArray[id-1].deleteAddressEntry(address); 		   		 
 
 }
 int Cache::getVictim(int set){
