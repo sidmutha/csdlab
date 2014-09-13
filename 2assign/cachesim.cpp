@@ -80,7 +80,7 @@ int main(int argc, char** argv){
   // readin pintrace file:
   f.open("pinatrace_mini.out");
   string rw;
-  uint64_t addr = 0x7fa4f3a28a60;
+  unsigned long addr;// = 0x7fa4f3a28a60;
   string t;
   do{
     line.clear();
@@ -92,16 +92,26 @@ int main(int argc, char** argv){
     ss.clear();
     ss << line;
     
-    ss >> temp >> rw >> t;// >> addr;
-    /*
+    ss >> temp >> rw  >> t;//addr;
+    addr = strtoul(t.c_str(), NULL, 16);
+    
     if(rw.compare("R")){
       w->read(addr);
     }else{
       w->write(addr);
     }
-    */
-    cout << t << " | " << rw << endl;
+    
+    
+    //cout << addr << " | " << rw << endl;
     
   }while(true);
+  for(i = 0; i < numCaches; i++){
+    cout << "L" << i+1 << ": read hits: " << w->cacheArray[i].readHits << endl;
+    cout << "L" << i+1 << ": read misses: " << w->cacheArray[i].readMisses << endl;
+    cout << "L" << i+1 << ": write hits: " << w->cacheArray[i].writeHits << endl;
+    cout << "L" << i+1 << ": write misses: " << w->cacheArray[i].writeMisses << endl;
+    cout << "-----------------------------------\n";
+  }
+  
   return 0;
 }

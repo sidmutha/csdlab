@@ -4,6 +4,8 @@
 #include<time.h>
 #include<math.h>
 
+using namespace std;
+
 Cache::Cache(int id, Wrapper *w, int size, int associativity, int blockSize, int replacementPolicy){
   numSets = size * 1024 / (associativity * blockSize);
   numWays = associativity;
@@ -39,11 +41,14 @@ void Cache::read(uint64_t address){
   int set = getSet(address);
   uint64_t tag = getTag(address);
   int way;
+  cout << "read address: " << address << endl;
   if((way = findTagInSet(tag, set)) != -1){ // address present in cache
+    cout << "found address in L" << (id + 1) << endl;
     readHits++;
-    cache[set][way].lru = 1;
+    checkSetLRU(set,way);
     cache[set][way].freq++;
   }else{ // address not in cache/set
+    cout << "address not in L" << (id + 1) << endl;
     readMisses++;
     get(address); // get data from higher level cache
     way = getVictim(set); // get victim from the set
@@ -53,7 +58,7 @@ void Cache::read(uint64_t address){
     }
     deleteAddressEntry(address);
     cache[set][way].tag = tag; // install data/tag in cache line
-    cache[set][way].lru = 1;
+    checkSetLRU(set,way);
     cache[set][way].dirty = false;
     cache[set][way].freq = 1;
     cache[set][way].state =1;	
@@ -64,13 +69,17 @@ void Cache::write(uint64_t address){
   int set = getSet(address);
   uint64_t tag = getTag(address);
   int way;
+  cout << "write address: " << address << endl;
+  cout << "set: " << set << endl;
   if((way = findTagInSet(tag, set)) != -1){ // address present in cache
+    cout << "found address in L" << (id + 1) << " in way "<< way << endl;
     writeHits++;
     cache[set][way].dirty = true;
-    cache[set][way].lru = 1;
+    checkSetLRU(set,way);
     cache[set][way].freq++;
 
   }else{ // address not in cache/set
+    cout << "address not in L" << (id + 1) << endl;
     writeMisses++;
     get(address); // get data from higher level cache
     way = getVictim(set); // get victim from the set
@@ -79,11 +88,31 @@ void Cache::write(uint64_t address){
     }
     deleteAddressEntry(address);
     cache[set][way].tag = tag; // install data/tag in cache line
-    cache[set][way].lru = 1;
+    checkSetLRU(set,way);
     cache[set][way].dirty = true; // because we're writing to it
     cache[set][way].freq = 1;
     cache[set][way].state = 1 ;
   }
+}
+
+void Cache::checkSetLRU(int set, int way_in){
+  int i, count =0, way;
+  for(i = 0; i < numWays; i++){
+    if(cache[set][i].lru == 0){
+      count++;
+      way = i;
+    }
+  }
+  if(count == 1){
+    for(i = 0; i < numWays; i++)
+      if(i==way)
+	cache[set][i].lru = 1;
+      else
+	cache[set][i].lru = 0;
+  }
+  else
+    cache[set][way_in].lru = 1;
+  
 }
 
 int Cache::getSet(uint64_t address){
@@ -95,7 +124,7 @@ uint64_t Cache::getTag(uint64_t address){
 }
 
 uint64_t Cache::generatePseudoAddress(int set, uint64_t tag){
-  //return 0;
+  return (tag << (setBits + offsetBits)) + (set << offsetBits);
 }
 
 int Cache::findTagInSet(uint64_t tag, int set){
@@ -105,6 +134,7 @@ int Cache::findTagInSet(uint64_t tag, int set){
       return i;
     }
   }
+  return -1;
 }
 
 void Cache::get(uint64_t address){
@@ -130,8 +160,8 @@ void Cache::deleteAddressEntry(uint64_t address){
     return;
   
   wrapper->cacheArray[id-1].deleteAddressEntry(address); 		   		 
-
 }
+
 int Cache::getVictim(int set){
   int i, j, way, min;
   switch(replacementPolicy){

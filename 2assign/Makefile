@@ -2,8 +2,8 @@ FLAGS = -g --std=c++11
 
 all: pinatrace
 
-#sim: cachesim.o wrapper.o cache.o
-#	g++ $(FLAGS) -o sim cachesim.o wrapper.o cache.o
+sim: cachesim.o wrapper.o cache.o
+	g++ $(FLAGS) -o sim cachesim.o wrapper.o cache.o
 
 pinatrace: pinatrace.cpp wrapper.o cache.o
 	g++ -g -std=c++11 -DBIGARRAY_MULTIPLIER=1 -Wall -Werror -Wno-unknown-pragmas -fno-stack-protector -DTARGET_IA32E -DHOST_IA32E -fPIC -DTARGET_LINUX  -I./pin/source/include/pin -I./pin/source/include/pin/gen -I./pin/extras/components/include -I./pin/extras/xed2-intel64/include -I./pin/source/tools/InstLib -O3 -fomit-frame-pointer -fno-strict-aliasing   -c -o pinatrace.o  pinatrace.cpp

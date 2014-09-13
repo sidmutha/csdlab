@@ -41,26 +41,29 @@
 #include<sstream>
 #include<fstream>
 #include<cstdint>
-using namespace std;
+
 
 FILE * trace;
+FILE * itrace;
 Wrapper* w;
-
 // Print a memory read record
 VOID RecordMemRead(VOID * ip, VOID * addr)
 {
-  fprintf(trace,"%p: R %p\n", ip, addr);
-  //cout << "read\n";
+  //fprintf(trace,"%p: R %p\n", ip, addr);
   w->read((uint64_t) addr);
 }
 
 // Print a memory write record
 VOID RecordMemWrite(VOID * ip, VOID * addr)
 {
-  fprintf(trace,"%p: W %p\n", ip, addr);
-  //cout << "write\n";
+  //fprintf(trace,"%p: W %p\n", ip, addr);
   w->write((uint64_t) addr);
 
+}
+
+VOID ReadInst(void* addr){
+  w->read((uint64_t)addr);
+  //cout << "read: " << addr << endl;
 }
 
 // Is called for every instruction and instruments reads and writes
@@ -71,8 +74,15 @@ VOID Instruction(INS ins, VOID *v)
   //
   // On the IA-32 and Intel(R) 64 architectures conditional moves and REP 
   // prefixed instructions appear as predicated instructions in Pin.
+  
+  //w->read(INS_Address(ins)); // reading the instruction (from our cache)
+  
+  //cout << INS_Address(ins) << endl;
+  //ADDRINT addr = INS_Address(ins);
+  INS_InsertCall(ins, IPOINT_BEFORE, (AFUNPTR)ReadInst, IARG_INST_PTR, IARG_END);
+  
   UINT32 memOperands = INS_MemoryOperandCount(ins);
-
+  
   // Iterate over each memory operand of the instruction.
   for (UINT32 memOp = 0; memOp < memOperands; memOp++)
     {
@@ -123,16 +133,18 @@ int main(int argc, char *argv[])
 {
   if (PIN_Init(argc, argv)) return Usage();
     
-  trace = fopen("pinatrace.out", "w");
+  trace = fopen("pinatrace.out2", "w");
+  itrace = fopen("itr.out", "w");
   
   // read config.txt
   string line;
-  ifstream f("config.txt");;//argv[1]);
+  ifstream f("config.txt");
   getline(f, line);
   stringstream ss(line);
   string temp;
   int numCaches;
   ss >> temp >> temp >> numCaches;
+
   w = new Wrapper(numCaches);
 
   int i;
@@ -183,7 +195,7 @@ int main(int argc, char *argv[])
     }
     
     w->cacheArray[i] = Cache(i, w, size, asso, blockSize, replacementPolicy);
-    //cout << i << " " << size << " "<< asso << " "<< blockSize << " "<< endl;
+    
   }
   f.close();
 

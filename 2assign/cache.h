@@ -45,7 +45,7 @@ class Cache{
   uint64_t generatePseudoAddress(int set, uint64_t tag);
   int findTagInSet(uint64_t tag, int set); 
   void deleteAddressEntry(uint64_t address);
-  
+  void checkSetLRU(int, int);
   // do we really need these?
   void get(uint64_t address);
   void put(uint64_t address);
