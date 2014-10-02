@@ -1,0 +1,13 @@
+package assign3;
+
+public class ARF_Entry {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

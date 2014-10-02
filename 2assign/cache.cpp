@@ -41,20 +41,25 @@ void Cache::read(uint64_t address){
   int set = getSet(address);
   uint64_t tag = getTag(address);
   int way;
-  cout << "read address: " << address << endl;
+  //cout << "read address: " << address << endl;
   if((way = findTagInSet(tag, set)) != -1){ // address present in cache
-    cout << "found address in L" << (id + 1) << endl;
+    //cout << "found address in L" << (id + 1) << endl;
     readHits++;
+    hits++;
     checkSetLRU(set,way);
     cache[set][way].freq++;
   }else{ // address not in cache/set
-    cout << "address not in L" << (id + 1) << endl;
+    //cout << "address not in L" << (id + 1) << endl;
     readMisses++;
+
     get(address); // get data from higher level cache
     way = getVictim(set); // get victim from the set
    
     if(cache[set][way].dirty){ // if dirty, 
+      misses_dirty++;
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
+    }else{
+      misses_non_dirty++;
     }
     deleteAddressEntry(address);
     cache[set][way].tag = tag; // install data/tag in cache line
@@ -69,22 +74,26 @@ void Cache::write(uint64_t address){
   int set = getSet(address);
   uint64_t tag = getTag(address);
   int way;
-  cout << "write address: " << address << endl;
-  cout << "set: " << set << endl;
+  //cout << "write address: " << address << endl;
+  //cout << "set: " << set << endl;
   if((way = findTagInSet(tag, set)) != -1){ // address present in cache
-    cout << "found address in L" << (id + 1) << " in way "<< way << endl;
+    //cout << "found address in L" << (id + 1) << " in way "<< way << endl;
     writeHits++;
+    hits++;
     cache[set][way].dirty = true;
     checkSetLRU(set,way);
     cache[set][way].freq++;
 
   }else{ // address not in cache/set
-    cout << "address not in L" << (id + 1) << endl;
+    //cout << "address not in L" << (id + 1) << endl;
     writeMisses++;
     get(address); // get data from higher level cache
     way = getVictim(set); // get victim from the set
     if(cache[set][way].dirty){ // if dirty, 
+      misses_dirty++;
       put(generatePseudoAddress(set, tag)); // evict to higher level cache
+    }else{
+      misses_non_dirty++;
     }
     deleteAddressEntry(address);
     cache[set][way].tag = tag; // install data/tag in cache line

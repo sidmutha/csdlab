@@ -105,6 +105,7 @@ int main(int argc, char** argv){
     //cout << addr << " | " << rw << endl;
     
   }while(true);
+  
   for(i = 0; i < numCaches; i++){
     cout << "L" << i+1 << ": read hits: " << w->cacheArray[i].readHits << endl;
     cout << "L" << i+1 << ": read misses: " << w->cacheArray[i].readMisses << endl;

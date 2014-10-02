@@ -1,0 +1,23 @@
+package assign3;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class RRF {
+	int num_entries;
+	Map<String, RRF_Entry> RRF_Map;
+	
+
+	public RRF(int num_entries) {
+		this.num_entries = num_entries;
+		RRF_Map = new HashMap<String, RRF_Entry>(num_entries);
+		for(int i = 0; i < num_entries; i++){
+			String tag_name = "A" + i;
+			RRF_Map.put(tag_name, new RRF_Entry(tag_name));
+		}
+	}
+	
+	public RRF_Entry getEntry(String reg_name){
+		return RRF_Map.get(reg_name);
+	}
+}

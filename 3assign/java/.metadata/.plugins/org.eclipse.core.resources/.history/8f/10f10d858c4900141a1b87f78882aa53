@@ -1,0 +1,34 @@
+package assign3;
+
+public class ALU {
+	ReservationStation currentRS;
+	private ReservationStation[] reservationStations;
+	
+	
+	public ALU(ReservationStation[] reservationStations) {
+		super();
+		this.reservationStations = reservationStations;
+	}
+	
+	public void work(int clock) {
+		if(operate(clock)){ // it's time ;)
+			currentRS.complete();
+			currentRS.done();
+			
+			for(ReservationStation r : reservationStations){
+				if(!r.isVacant()){
+					currentRS = r;
+					break;
+				}
+			}
+		}else{
+			return;
+		}
+	}
+
+	private boolean operate(int clock) {
+		// TODO do the operation and set result in inst
+		return false;
+	}
+	
+}

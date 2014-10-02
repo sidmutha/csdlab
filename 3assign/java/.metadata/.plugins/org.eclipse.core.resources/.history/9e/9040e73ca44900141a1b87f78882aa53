@@ -1,0 +1,21 @@
+package assign3;
+
+import java.util.Iterator;
+import java.util.Queue;
+
+
+public class LoadStore {
+	Queue<Instruction> loadQueue;
+	Queue<Instruction> storeQueue;
+
+	public void addStore(Instruction storeInst){
+		storeQueue.add(storeInst);
+	}
+	
+	public void addLoad(Instruction loadInst){
+		Iterator<Instruction> iterator = storeQueue.iterator();
+		for(Instruction inst : iterator){
+			
+		}
+	}
+}

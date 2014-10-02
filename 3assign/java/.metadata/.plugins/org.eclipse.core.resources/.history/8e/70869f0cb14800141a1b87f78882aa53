@@ -1,0 +1,25 @@
+package assign3;
+
+public class ARF_Entry {
+	String reg_name;
+	String data = "";
+	boolean busy = false;
+	String RRF_tag = "";
+	
+	public ARF_Entry(String name) {
+		this.reg_name = name;
+	}	
+
+	public boolean isBusy(String reg_name){
+		return this.busy;
+	}
+
+	public String getRRF_tag() {
+		return RRF_tag;
+	}
+
+	public void setRRF_tag(String rRF_tag) {
+		RRF_tag = rRF_tag;
+	}
+}
+

@@ -50,10 +50,12 @@ class Cache{
   void get(uint64_t address);
   void put(uint64_t address);
   
-  int readHits;
-  int readMisses;
-  int writeHits;
-  int writeMisses;
+  long int hits, misses_non_dirty, misses_dirty;
+  
+  long int readHits;
+  long int readMisses;
+  long int writeHits;
+  long int writeMisses;
 };
 
 #endif

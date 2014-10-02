@@ -1,0 +1,12 @@
+package assign3;
+
+public class ARF {
+	class ARF_Entry {
+		String reg_name;
+		String data;
+		boolean busy;
+		String rrf_tag;
+	}
+	
+	
+}

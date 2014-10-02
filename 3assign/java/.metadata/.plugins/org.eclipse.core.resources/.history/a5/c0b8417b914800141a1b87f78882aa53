@@ -1,0 +1,21 @@
+package assign3;
+
+public class Instruction {
+	int inst_number;
+	String operation, destination, operand1, operand2;
+	String RRF_tag_dest, RRF_tag_op1, RRF_tag_op2;
+	boolean ready_op1, ready_op2;
+	boolean completed;
+	
+	public Instruction(int inst_number, String operation, String destination,
+			String operand1, String operand2) {
+		super();
+		this.inst_number = inst_number;
+		this.operation = operation;
+		this.destination = destination;
+		this.operand1 = operand1;
+		this.operand2 = operand2;
+	}
+	
+		
+}

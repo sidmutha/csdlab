@@ -46,6 +46,8 @@
 FILE * trace;
 FILE * itrace;
 Wrapper* w;
+int numCaches;
+
 // Print a memory read record
 VOID RecordMemRead(VOID * ip, VOID * addr)
 {
@@ -112,6 +114,27 @@ VOID Fini(INT32 code, VOID *v)
 {
   fprintf(trace, "#eof\n");
   fclose(trace);
+  for(int i = 0; i < numCaches; i++){
+    
+    cout << w->cacheArray[i].readHits 
+	 << ", " << w->cacheArray[i].readMisses 
+	 << ", " << w->cacheArray[i].writeHits 
+	 << ", " << w->cacheArray[i].writeMisses
+	 << ", " << w->cacheArray[i].hits
+	 << ", " << w->cacheArray[i].misses_non_dirty
+	 << ", " << w->cacheArray[i].misses_dirty	 
+	 << endl;
+
+    /*
+    cout << endl;
+    cout << "L" << i+1 << ": read hits: " << w->cacheArray[i].readHits << endl;
+    cout << "L" << i+1 << ": read misses: " << w->cacheArray[i].readMisses << endl;
+    cout << "L" << i+1 << ": write hits: " << w->cacheArray[i].writeHits << endl;
+    cout << "L" << i+1 << ": write misses: " << w->cacheArray[i].writeMisses << endl;
+    cout << "-----------------------------------\n";
+    */
+  }
+  
 }
 
 /* ===================================================================== */
@@ -142,7 +165,7 @@ int main(int argc, char *argv[])
   getline(f, line);
   stringstream ss(line);
   string temp;
-  int numCaches;
+  
   ss >> temp >> temp >> numCaches;
 
   w = new Wrapper(numCaches);
@@ -184,10 +207,11 @@ int main(int argc, char *argv[])
     ss.clear();
     ss << line;
     ss >> temp >> temp >> temp;
-    
+    //    cerr << "replacement policy: " << temp << endl;
     int replacementPolicy;
     if(temp.compare("LRU") == 0){
       replacementPolicy = 0;
+      
     }else if(temp.compare("LFU") == 0){
       replacementPolicy = 1;
     }else{
@@ -198,7 +222,8 @@ int main(int argc, char *argv[])
     
   }
   f.close();
-
+  
+   
 
   INS_AddInstrumentFunction(Instruction, 0);
   PIN_AddFiniFunction(Fini, 0);
