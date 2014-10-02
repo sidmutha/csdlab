@@ -21,8 +21,10 @@ public class LoadStore {
 			// TODO
 		}
 	}
+	
+	//TODO: constructor with memory array
 
 	public void tick() {
-
+		// TODO: this function
 	}
 }

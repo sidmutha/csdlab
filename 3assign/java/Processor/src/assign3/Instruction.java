@@ -5,8 +5,8 @@ public class Instruction {
 	String operation, destination, operand1, operand2;
 	String RRF_tag_dest, RRF_tag_op1, RRF_tag_op2;
 	Integer data_dest, data_op1, data_op2;
-	boolean ready_op1, ready_op2;
-	boolean completed;
+	boolean ready_op1 = false, ready_op2 = false;
+	boolean completed = false;
 	
 	public Instruction(int inst_number, String operation, String destination,
 			String operand1, String operand2) {

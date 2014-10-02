@@ -1,6 +1,0 @@
-package assign3;
-
-public class RRF_Entry {
-	String tag, data;
-	boolean busy, valid;
-}

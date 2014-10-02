@@ -6,6 +6,8 @@ public class ALU {
 	int eta; // time
 
 	public ALU(ReservationStation[] reservationStations) {
+		//TODO: add latencies
+		
 		super();
 		this.reservationStations = reservationStations;
 	}
