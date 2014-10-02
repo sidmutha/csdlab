@@ -1,13 +1,14 @@
 package assign3;
 
 import java.util.Queue;
-
+import java.util.Deque;
 public class LoadStore {
 	Queue<Instruction> loadQueue;
-	Queue<Instruction> storeQueue;
+	Deque<Instruction> storeQueue;
 
 	public void addStore(Instruction storeInst) {
-		storeQueue.add(storeInst);
+		storeQueue.addFirst(storeInst);
+		
 	}
 
 	public void addLoad(Instruction loadInst) {
@@ -15,6 +16,7 @@ public class LoadStore {
 		for (Instruction inst : storeQueue) {
 			// TODO: if inst is storing at same location as loadInst, cancel out
 			// and use
+			
 
 		}
 		if (storeInst != null) {
